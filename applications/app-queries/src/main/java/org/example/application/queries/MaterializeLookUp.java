@@ -17,10 +17,8 @@ import java.util.Map;
 @Component
 public class MaterializeLookUp {
     private final Map<String, Flux<DelegateService>> business = new HashMap<>();
-    private final AccountRepository repository;
 
     public MaterializeLookUp(ApplicationContext context, AccountRepository repository) {
-        this.repository = repository;
         business.put("org.example.AccountCreated", Flux.just(input -> {
             var event = (AccountCreated) input;
             var document = new AccountModeView();
@@ -48,9 +46,10 @@ public class MaterializeLookUp {
                 transactionModelView.setTransactionType(event.getTransactionType().value());
                 transactionModelView.setAmount(event.getAmount().value());
                 transactionModelView.setId(event.getId().value());
-
+                transactionModelView.setName(event.getName().value());
                 var trans = doc.getTransactionModelViews();
-                trans.add(transactionModelView);
+                trans.put(event.getId().value(), transactionModelView);
+
                 doc.setTransactionModelViews(trans);
                 switch (event.getTransactionType().value()) {
                     case "DEPOSIT":

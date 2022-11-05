@@ -1,24 +1,24 @@
 package org.example.application.queries.adapter.repo;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 public class AccountModeView {
     private String id;
     private String name;
     private String userId;
-    private Set<TransactionModelView> transactionModelViews;
     private Double balance;
     private Boolean active;
+    private Map<String, TransactionModelView> transactionModelViews;
 
-    public void setTransactionModelViews(Set<TransactionModelView> transactionModelViews) {
+    public void setTransactionModelViews(Map<String, TransactionModelView> transactionModelViews) {
         this.transactionModelViews = transactionModelViews;
     }
 
-    public Set<TransactionModelView> getTransactionModelViews() {
+    public Map<String, TransactionModelView> getTransactionModelViews() {
         if (Objects.isNull(transactionModelViews))
-            return new HashSet<>();
+            return new HashMap<>();
         return transactionModelViews;
     }
 
@@ -70,9 +70,9 @@ public class AccountModeView {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", userId='" + userId + '\'' +
-                ", transactionModelViews=" + transactionModelViews +
                 ", balance=" + balance +
                 ", active=" + active +
+                ", transactionModelViews=" + transactionModelViews +
                 '}';
     }
 }
