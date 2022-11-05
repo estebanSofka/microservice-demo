@@ -2,6 +2,7 @@ package org.example.business;
 
 import org.example.domain.Account;
 import org.example.domain.command.AddTransactionUseCommand;
+import org.example.domain.value.TransactionDate;
 import org.example.domain.value.TransactionId;
 import org.example.generic.business.EventStoreRepository;
 import org.example.generic.domain.DomainEvent;
@@ -24,10 +25,10 @@ public class AddTransactionUseCase implements Function<Mono<AddTransactionUseCom
             var id = command.getId();
             return repository.getEventsBy("account", id.value()).collectList().flatMapIterable(events -> {
                 var account = Account.from(id, events);
-                if(account.transactions().size() == 10){
+                if (account.transactions().size() == 10) {
                     throw new IllegalArgumentException("Business Error");
                 }
-                account.addTransaction(new TransactionId(), command.getDate());
+                account.addTransaction(new TransactionId(), new TransactionDate(command.getTransactionDate()), command.getTransactionType(), command.getAmount());
                 return account.getUncommittedChanges();
             });
         });

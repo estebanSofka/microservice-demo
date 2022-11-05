@@ -16,6 +16,9 @@ spring:
   data:
     mongodb:
         uri: ${MONGO_URI:mongodb://localhost:27017/demo}
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
 microservice:
   exchange: ${EXCHANGE:core-demo}
   queue: ${QUEUE:demo.commandhandles}

@@ -1,10 +1,12 @@
 package org.example.application.queries.adapter.repo;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class TransactionModelView {
     private String id;
-    private Date date;
+    private LocalDateTime transactionDate;
+    private String transactionType;
+    private Double amount;
 
     public String getId() {
         return id;
@@ -14,19 +16,37 @@ public class TransactionModelView {
         this.id = id;
     }
 
-    public Date getDate() {
-        return date;
+    public LocalDateTime getTransactionDate() {
+        return transactionDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public String getTransactionType() {
+        return transactionType;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setTransactionDate(LocalDateTime transactionDate) {
+        this.transactionDate = transactionDate;
+    }
+
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
     }
 
     @Override
     public String toString() {
         return "TransactionModelView{" +
                 "id='" + id + '\'' +
-                ", date=" + date +
+                ", transactionDate=" + transactionDate +
+                ", transactionType='" + transactionType + '\'' +
+                ", amount=" + amount +
                 '}';
     }
 }

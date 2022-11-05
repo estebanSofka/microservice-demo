@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Comparator;
 
 @Component
@@ -25,6 +27,16 @@ public class MongoEventStoreRepository implements EventStoreRepository {
     public MongoEventStoreRepository(ReactiveMongoTemplate template, EventSerializer eventSerializer) {
         this.template = template;
         this.eventSerializer = eventSerializer;
+    }
+
+    @Override
+    public Flux<String> getAggretateIdsByCreationDate(String aggregateName, LocalDateTime creationDate) {
+        var query = new Query(Criteria
+                .where("storedEvent.typeName").is("org.example.domain.events.AccountCreated")
+                .and("storedEvent.occurredOn").lt(creationDate.with(LocalTime.MIN)));
+        return template.find(query, DocumentEventStored.class, aggregateName)
+                .sort(Comparator.comparing(event -> event.getStoredEvent().getOccurredOn()))
+                .map(storeEvent -> storeEvent.getStoredEvent().deserializeEvent(eventSerializer).aggregateRootId());
     }
 
     @Override

@@ -1,15 +1,12 @@
 package org.example.application.command.handle;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.example.business.AddTransactionUseCase;
 import org.example.business.CreateAccountUseCase;
+import org.example.business.DeactivateAccountUseCase;
 import org.example.domain.command.AddTransactionUseCommand;
 import org.example.domain.command.CreateAccountCommand;
-import org.example.domain.events.TransactionAdded;
+import org.example.domain.command.DeactivateAccountCommand;
 import org.example.domain.value.AccountId;
-import org.example.domain.value.Name;
-import org.example.domain.value.UserId;
 import org.example.generic.business.IntegrationHandle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import java.util.Date;
 import java.util.Map;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
@@ -28,6 +24,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class CommandHandle {
     private final IntegrationHandle integrationHandle;
     private final ErrorHandler errorHandler;
+
     public CommandHandle(IntegrationHandle integrationHandle, ErrorHandler errorHandler) {
         this.integrationHandle = integrationHandle;
         this.errorHandler = errorHandler;
@@ -44,6 +41,20 @@ public class CommandHandle {
                         .then(ServerResponse.ok().build())
                         .onErrorResume(errorHandler::badRequest)
 
+        );
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> inactivar(DeactivateAccountUseCase usecase) {
+
+        return route(
+                POST("/account/deactivate").and(accept(MediaType.APPLICATION_JSON)),
+
+                request -> usecase.andThen(integrationHandle)
+                        .apply(request.bodyToMono(Map.class)
+                                .map(map -> new DeactivateAccountCommand(AccountId.of((String) map.get("id")))))
+                        .then(ServerResponse.ok().build())
+                        .onErrorResume(errorHandler::badRequest)
         );
     }
 

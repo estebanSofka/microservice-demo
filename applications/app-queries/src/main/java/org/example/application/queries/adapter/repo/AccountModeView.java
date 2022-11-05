@@ -1,7 +1,5 @@
 package org.example.application.queries.adapter.repo;
 
-import org.example.domain.events.TransactionAdded;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -11,15 +9,16 @@ public class AccountModeView {
     private String name;
     private String userId;
     private Set<TransactionModelView> transactionModelViews;
+    private Double balance;
+    private Boolean active;
 
     public void setTransactionModelViews(Set<TransactionModelView> transactionModelViews) {
         this.transactionModelViews = transactionModelViews;
     }
 
     public Set<TransactionModelView> getTransactionModelViews() {
-        if(Objects.isNull(transactionModelViews)){
+        if (Objects.isNull(transactionModelViews))
             return new HashSet<>();
-        }
         return transactionModelViews;
     }
 
@@ -47,6 +46,24 @@ public class AccountModeView {
         this.userId = userId;
     }
 
+    public Double getBalance() {
+        if (Objects.isNull(balance))
+            return 0.0;
+        return balance;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
+    }
+
     @Override
     public String toString() {
         return "AccountModeView{" +
@@ -54,6 +71,8 @@ public class AccountModeView {
                 ", name='" + name + '\'' +
                 ", userId='" + userId + '\'' +
                 ", transactionModelViews=" + transactionModelViews +
+                ", balance=" + balance +
+                ", active=" + active +
                 '}';
     }
 }

@@ -17,6 +17,7 @@
         <module>business</module>
         <module>applications</module>
         <module>generic</module>
+        <module>app-scheduler</module>
     </modules>
 
     <properties>

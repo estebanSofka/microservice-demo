@@ -1,9 +1,12 @@
 package org.example.application.command;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import org.example.generic.*;
+import org.example.generic.GsonEventSerializer;
 import org.example.generic.business.EventPublisher;
 import org.example.generic.business.EventSerializer;
 import org.example.generic.business.EventStoreRepository;
@@ -12,11 +15,10 @@ import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.*;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -35,6 +37,8 @@ import java.util.Arrays;
 )
 public class ApplicationConfig {
 
+    @Autowired
+    private ObjectMapper objectMapper;
     private final AmqpAdmin amqpAdmin;
     private final ConfigProperties configProperties;
 
@@ -50,6 +54,7 @@ public class ApplicationConfig {
         amqpAdmin.declareExchange(exchange);
         amqpAdmin.declareQueue(queue);
         amqpAdmin.declareBinding(BindingBuilder.bind(queue).to(exchange).with(configProperties.getRoutingKey()));
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Bean
@@ -89,7 +94,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public  GsonEventSerializer gsonEventSerializer() {
+    public GsonEventSerializer gsonEventSerializer() {
         return new GsonEventSerializer();
     }
 
@@ -106,6 +111,15 @@ public class ApplicationConfig {
         source.registerCorsConfiguration("/**", corsConfig);
 
         return new CorsWebFilter(source);
+    }
+
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+        ObjectMapper objectMapper = builder.build();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        return objectMapper;
     }
 
 }

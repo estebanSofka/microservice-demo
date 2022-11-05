@@ -1,21 +1,23 @@
 package org.example.domain;
 
 import org.example.domain.events.AccountCreated;
+import org.example.domain.events.AccountDeactivated;
 import org.example.domain.events.TransactionAdded;
-import org.example.domain.value.AccountId;
-import org.example.domain.value.Name;
-import org.example.domain.value.TransactionId;
-import org.example.domain.value.UserId;
+import org.example.domain.value.*;
 import org.example.generic.domain.AggregateRoot;
 import org.example.generic.domain.DomainEvent;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class Account extends AggregateRoot<AccountId> {
 
     protected Name name;
     protected UserId userId;
     protected Map<TransactionId, Transaction> transactions;
+    protected Balance balance;
+    protected Boolean active;
 
     public Account(AccountId id, UserId userId, Name name) {
         super(id);
@@ -23,23 +25,26 @@ public class Account extends AggregateRoot<AccountId> {
         appendChange(new AccountCreated(userId, name)).apply();
     }
 
-    private Account(AccountId id){
+    private Account(AccountId id) {
         super(id);
         subscribe(new AccountEventChange(this));
     }
 
-    public static Account from(AccountId id, List<DomainEvent> events){
+    public static Account from(AccountId id, List<DomainEvent> events) {
         var account = new Account(id);
         events.forEach(account::applyEvent);
         return account;
     }
 
-    public void addTransaction(TransactionId id, Date date){
-        appendChange(new TransactionAdded(id, date)).apply();
+    public void addTransaction(TransactionId id, TransactionDate transactionDate, TransactionType transactionType, Amount amount) {
+        appendChange(new TransactionAdded(id, transactionDate, transactionType, amount)).apply();
     }
 
+    public void inactivateAccount(){
+        appendChange(new AccountDeactivated()).apply();
+    }
 
-    public Transaction getTransactionById(TransactionId id){
+    public Transaction getTransactionById(TransactionId id) {
         return transactions.get(id);
     }
 
@@ -53,5 +58,9 @@ public class Account extends AggregateRoot<AccountId> {
 
     public UserId userId() {
         return userId;
+    }
+
+    public Balance balance() {
+        return balance;
     }
 }

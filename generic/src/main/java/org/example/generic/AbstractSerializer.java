@@ -4,6 +4,7 @@ import com.google.gson.*;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 
 public abstract class AbstractSerializer {
@@ -14,8 +15,8 @@ public abstract class AbstractSerializer {
 
     protected AbstractSerializer() {
         this.gson = new GsonBuilder()
-                .registerTypeAdapter(Instant.class, new DateSerializer())
-                .registerTypeAdapter(Instant.class, new DateDeserializer())
+                .registerTypeAdapter(Instant.class, new LocalDateTimeSerializer())
+                .registerTypeAdapter(Instant.class, new LocalDateTimeDeserializer())
                 .serializeNulls()
                 .create();
     }
@@ -25,18 +26,17 @@ public abstract class AbstractSerializer {
         return gson;
     }
 
-    private static class DateSerializer implements JsonSerializer<Instant> {
+    private static class LocalDateTimeSerializer implements JsonSerializer<LocalDateTime> {
         @Override
-        public JsonElement serialize(Instant source, Type typeOfSource, JsonSerializationContext context) {
-            return new JsonPrimitive(Long.toString(source.toEpochMilli()));
+        public JsonElement serialize(LocalDateTime source, Type typeOfSource, JsonSerializationContext context) {
+            return new JsonPrimitive(source.toString());
         }
     }
 
-    private static class DateDeserializer implements JsonDeserializer<Instant> {
+    private static class LocalDateTimeDeserializer implements JsonDeserializer<LocalDateTime> {
         @Override
-        public Instant deserialize(JsonElement json, Type typeOfTarget, JsonDeserializationContext context) {
-            long time = Long.parseLong(json.getAsJsonPrimitive().getAsString());
-            return Instant.ofEpochMilli(time);
+        public LocalDateTime deserialize(JsonElement json, Type typeOfTarget, JsonDeserializationContext context) {
+            return LocalDateTime.parse(json.getAsJsonPrimitive().getAsString());
         }
     }
 }

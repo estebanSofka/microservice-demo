@@ -16,6 +16,7 @@
         <module>app-command</module>
         <module>app-queries</module>
         <module>app-proxy</module>
+        <module>app-scheduler</module>
     </modules>
 
     <dependencies>
